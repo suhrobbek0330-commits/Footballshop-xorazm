@@ -14,12 +14,12 @@ import {
 import clsx from 'clsx';
 
 const navigation = [
-    { name: 'Dashboard', href: '/', icon: HomeIcon, roles: ['admin', 'superadmin'] },
-    { name: 'POS', href: '/pos', icon: CurrencyDollarIcon, roles: ['user', 'admin', 'superadmin'] },
-    { name: 'Products', href: '/products', icon: ShoppingBagIcon, public: true }, // Public price list
-    { name: 'Debts', href: '/debts', icon: CreditCardIcon, roles: ['user', 'admin', 'superadmin'] },
-    { name: 'Demands', href: '/demands', icon: ClipboardDocumentListIcon, roles: ['user', 'admin', 'superadmin'] },
-    { name: 'Users', href: '/users', icon: UsersIcon, roles: ['superadmin'] },
+    { name: 'Bosh sahifa', href: '/', icon: HomeIcon, roles: ['superadmin'] },
+    { name: 'Kassa', href: '/pos', icon: CurrencyDollarIcon, roles: ['admin', 'superadmin'] },
+    { name: 'Mahsulotlar', href: '/products', icon: ShoppingBagIcon, public: true },
+    { name: 'Qarzdorlar', href: '/debts', icon: CreditCardIcon, roles: ['admin', 'superadmin'] },
+    { name: 'Buyurtmalar', href: '/demands', icon: ClipboardDocumentListIcon, roles: ['admin', 'superadmin'] },
+    { name: 'Foydalanuvchilar', href: '/users', icon: UsersIcon, roles: ['superadmin'] },
 ];
 
 function Sidebar() {

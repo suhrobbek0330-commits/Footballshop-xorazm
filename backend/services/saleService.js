@@ -59,15 +59,23 @@ const createSale = async (saleData, userId) => {
 };
 
 const getSalesStats = async (period = 'daily') => {
-    const date = new Date();
-    let start, end;
+    const now = new Date();
+    let start = new Date(now);
+    let end = new Date(now);
 
     if (period === 'daily') {
-        start = new Date(date.setHours(0, 0, 0, 0));
-        end = new Date(date.setHours(23, 59, 59, 999));
+        start.setHours(0, 0, 0, 0);
+        end.setHours(23, 59, 59, 999);
+    } else if (period === 'weekly') {
+        // Last 7 days
+        start.setDate(now.getDate() - 7);
+        start.setHours(0, 0, 0, 0);
+        end.setHours(23, 59, 59, 999);
     } else if (period === 'monthly') {
-        start = new Date(date.getFullYear(), date.getMonth(), 1);
-        end = new Date(date.getFullYear(), date.getMonth() + 1, 0, 23, 59, 59, 999);
+        // Last 30 days
+        start.setDate(now.getDate() - 30);
+        start.setHours(0, 0, 0, 0);
+        end.setHours(23, 59, 59, 999);
     }
 
     // Pipeline to calculate stats from Sales (Paid)
@@ -204,6 +212,43 @@ const getSalesStats = async (period = 'daily') => {
         combinedCategories[catId].count += item.count;
     });
 
+    // Trend Stats (Daily grouping)
+    const trendStats = await Sale.aggregate([
+        { $match: { createdAt: { $gte: start, $lte: end } } },
+        {
+            $group: {
+                _id: { $dateToString: { format: "%Y-%m-%d", date: "$createdAt" } },
+                revenue: { $sum: "$totalAmount" }
+            }
+        },
+        { $sort: { _id: 1 } }
+    ]);
+
+    const debtTrendStats = await Debt.aggregate([
+        { $match: { createdAt: { $gte: start, $lte: end } } },
+        {
+            $group: {
+                _id: { $dateToString: { format: "%Y-%m-%d", date: "$createdAt" } },
+                revenue: { $sum: "$totalAmount" }
+            }
+        },
+        { $sort: { _id: 1 } }
+    ]);
+
+    // Combine Trend
+    const trendMap = {};
+    trendStats.forEach(item => {
+        trendMap[item._id] = (trendMap[item._id] || 0) + item.revenue;
+    });
+    debtTrendStats.forEach(item => {
+        trendMap[item._id] = (trendMap[item._id] || 0) + item.revenue;
+    });
+
+    const trend = Object.keys(trendMap).sort().map(dateStr => ({
+        date: dateStr,
+        revenue: trendMap[dateStr]
+    }));
+
     return {
         summary: {
             totalRevenue,
@@ -213,7 +258,8 @@ const getSalesStats = async (period = 'daily') => {
             totalSalesCount: s.paidCount,
             pendingDebts: d.pendingDebtSum
         },
-        categories: Object.values(combinedCategories)
+        categories: Object.values(combinedCategories),
+        trend
     };
 };
 

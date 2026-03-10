@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
+import { useSelector } from 'react-redux';
 import api from '../../services/api';
 import { PackageSearch, UserCheck, CheckCircle, Clock } from 'lucide-react';
 import { toast } from 'react-toastify';
 
 const DemandList = () => {
+    const { user } = useSelector((state) => state.auth);
     const [demands, setDemands] = useState([]);
     const [loading, setLoading] = useState(true);
 
@@ -66,12 +68,14 @@ const DemandList = () => {
                                 </div>
                             </div>
 
-                            <button
-                                onClick={() => handleFulfill(demand._id)}
-                                className="mt-6 w-full flex items-center justify-center gap-2 bg-indigo-600 text-white py-2.5 rounded-xl font-bold hover:bg-indigo-700 transition"
-                            >
-                                <CheckCircle size={18} /> Bajarildi
-                            </button>
+                            {(user?.role === 'admin' || user?.role === 'superadmin') && (
+                                <button
+                                    onClick={() => handleFulfill(demand._id)}
+                                    className="mt-6 w-full flex items-center justify-center gap-2 bg-indigo-600 text-white py-2.5 rounded-xl font-bold hover:bg-indigo-700 transition"
+                                >
+                                    <CheckCircle size={18} /> Bajarildi
+                                </button>
+                            )}
                         </div>
                     ))
                 )}

@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
+import { useSelector } from 'react-redux';
 import api from '../../services/api';
-import { User, Phone, Calendar, Clock, CheckCircle, AlertTriangle } from 'lucide-react';
+import { User, Phone, Calendar, Clock, CheckCircle, AlertTriangle, Plus, Minus } from 'lucide-react';
 import { toast } from 'react-toastify';
 
 const DebtList = () => {
+    const { user } = useSelector((state) => state.auth);
     const [debts, setDebts] = useState([]);
     const [loading, setLoading] = useState(true);
 
@@ -29,7 +31,23 @@ const DebtList = () => {
             toast.success('Qarz yopildi!');
             fetchDebts();
         } catch (error) {
-            toast.error('Xatolik yuz berdi');
+            console.error('Payment error:', error);
+            const message = error.response?.data?.message || 'To\'lovni amalga oshirishda xatolik yuz berdi';
+            toast.error(message);
+        }
+    };
+
+    const adjustAmount = async (id, currentAmount, delta) => {
+        const newAmount = currentAmount + delta;
+        if (newAmount < 0) return;
+
+        try {
+            await api.put(`/debts/${id}/amount`, { amount: newAmount });
+            toast.success('Qarz miqdori yangilandi');
+            setDebts(prev => prev.map(d => d._id === id ? { ...d, totalAmount: newAmount } : d));
+        } catch (error) {
+            console.error('Update amount error:', error);
+            toast.error('Miqdorni yangilashda xatolik!');
         }
     };
 
@@ -71,9 +89,27 @@ const DebtList = () => {
                                         <span>{((p.price || 0) * (p.quantity || 0)).toLocaleString()}</span>
                                     </div>
                                 ))}
-                                <div className="flex justify-between font-bold text-lg pt-2 text-indigo-600">
+                                <div className="flex items-center justify-between font-bold text-lg pt-2 text-indigo-600">
                                     <span>Jami:</span>
-                                    <span>{(debt.totalAmount || 0).toLocaleString()} so'm</span>
+                                    <div className="flex items-center gap-2">
+                                        {debt.status !== 'paid' && (user?.role === 'admin' || user?.role === 'superadmin') && (
+                                            <button
+                                                onClick={() => adjustAmount(debt._id, debt.totalAmount, -1000)}
+                                                className="p-1 hover:bg-red-50 text-red-500 rounded border border-red-200"
+                                            >
+                                                <Minus size={14} />
+                                            </button>
+                                        )}
+                                        <span>{(debt.totalAmount || 0).toLocaleString()} so'm</span>
+                                        {debt.status !== 'paid' && (user?.role === 'admin' || user?.role === 'superadmin') && (
+                                            <button
+                                                onClick={() => adjustAmount(debt._id, debt.totalAmount, 1000)}
+                                                className="p-1 hover:bg-green-50 text-green-500 rounded border border-green-200"
+                                            >
+                                                <Plus size={14} />
+                                            </button>
+                                        )}
+                                    </div>
                                 </div>
                             </div>
 
@@ -82,7 +118,7 @@ const DebtList = () => {
                                     <Calendar size={16} />
                                     <span>Muddati: {debt.deadline ? new Date(debt.deadline).toLocaleDateString() : 'Belgilanmagan'}</span>
                                 </div>
-                                {debt.status !== 'paid' && (
+                                {debt.status !== 'paid' && (user?.role === 'admin' || user?.role === 'superadmin') && (
                                     <button
                                         onClick={() => markAsPaid(debt._id)}
                                         className="flex items-center gap-1 bg-green-500 text-white px-3 py-1.5 rounded-lg hover:bg-green-600 transition text-xs font-bold"

@@ -16,6 +16,24 @@ import DemandList from './pages/Demands/DemandList';
 import Users from './pages/Users';
 import Register from './pages/Register';
 
+import { useSelector } from 'react-redux';
+import { Navigate } from 'react-router-dom';
+
+const HomeRedirect = () => {
+  const { user } = useSelector((state) => state.auth);
+
+  if (!user) return <Navigate to="/login" />;
+
+  if (user.role === 'superadmin') {
+    return <Dashboard />;
+  } else if (user.role === 'admin') {
+    return <Navigate to="/pos" />;
+  } else {
+    // defaults to user role
+    return <Navigate to="/products" />;
+  }
+};
+
 function App() {
   return (
     <>
@@ -24,7 +42,7 @@ function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
           <Route element={<Layout />}>
-            <Route path="/" element={<Dashboard />} />
+            <Route path="/" element={<HomeRedirect />} />
             <Route path="/products" element={<ProductList />} />
             <Route path="/pos" element={<POS />} />
             <Route path="/debts" element={<DebtList />} />

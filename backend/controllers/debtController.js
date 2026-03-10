@@ -25,4 +25,12 @@ const updateDebtStatus = asyncHandler(async (req, res) => {
     res.json(debt);
 });
 
-module.exports = { createDebt, getDebts, updateDebtStatus };
+// @desc    Update debt amount
+// @route   PUT /api/debts/:id/amount
+// @access  Private/Admin
+const updateDebtAmount = asyncHandler(async (req, res) => {
+    const debt = await debtService.updateDebtAmount(req.params.id, req.body.amount);
+    res.json(debt);
+});
+
+module.exports = { createDebt, getDebts, updateDebtStatus, updateDebtAmount };

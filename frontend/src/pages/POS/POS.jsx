@@ -164,7 +164,7 @@ const POS = () => {
                                 <div className="flex flex-col gap-2">
                                     <div className="aspect-square rounded-lg bg-gray-50 flex items-center justify-center overflow-hidden">
                                         {product.image ? (
-                                            <img src={`http://localhost:5000${product.image}`} alt={product.name} className="w-full h-full object-cover" />
+                                            <img src={product.image} alt={product.name} className="w-full h-full object-cover" />
                                         ) : (
                                             <ImageIcon className="text-gray-300" size={32} />
                                         )}

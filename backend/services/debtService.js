@@ -77,6 +77,15 @@ const updateDebtStatus = async (id, status) => {
     }
 };
 
+const updateDebtAmount = async (id, amount) => {
+    const debt = await Debt.findById(id);
+    if (!debt) {
+        throw new Error('Debt not found');
+    }
+    debt.totalAmount = amount;
+    return await debt.save();
+};
+
 const checkOverdueDebts = async () => {
     const now = new Date();
     await Debt.updateMany(
@@ -85,4 +94,4 @@ const checkOverdueDebts = async () => {
     );
 };
 
-module.exports = { createDebt, getDebts, updateDebtStatus, checkOverdueDebts };
+module.exports = { createDebt, getDebts, updateDebtStatus, updateDebtAmount, checkOverdueDebts };
