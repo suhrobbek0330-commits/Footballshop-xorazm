@@ -17,10 +17,18 @@ const POS = () => {
 
     useEffect(() => {
         const fetchProducts = async () => {
-            const { data } = await api.get(`/products?keyword=${keyword}`);
-            setProducts(data);
+            try {
+                const { data } = await api.get(`/products?keyword=${keyword}`);
+                setProducts(data);
+            } catch (error) {
+                console.error('Error fetching products:', error);
+            }
         };
         fetchProducts();
+
+        // Har 10 soniyada yangilab turish
+        const interval = setInterval(fetchProducts, 10000);
+        return () => clearInterval(interval);
     }, [keyword]);
 
     const addToCart = (product) => {

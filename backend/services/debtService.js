@@ -17,6 +17,23 @@ const createDebt = async (debtData) => {
                         throw new Error(`Mahsulot yetarli emas: ${product.name}`);
                     }
                     product.quantity -= item.quantity;
+
+                    // Variantlarni yangilash (agar mavjud bo'lsa)
+                    if (product.variants && product.variants.length > 0) {
+                        let remainingToSubtract = item.quantity;
+                        for (let variant of product.variants) {
+                            if (remainingToSubtract <= 0) break;
+                            
+                            const canSubtract = Math.min(variant.quantity, remainingToSubtract);
+                            variant.quantity -= canSubtract;
+                            remainingToSubtract -= canSubtract;
+                        }
+                        
+                        if (remainingToSubtract > 0) {
+                            product.variants[product.variants.length - 1].quantity -= remainingToSubtract;
+                        }
+                    }
+
                     product.soldHistory.push({
                         soldPrice: item.price,
                         quantity: item.quantity,

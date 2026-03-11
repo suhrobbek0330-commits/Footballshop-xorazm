@@ -23,6 +23,25 @@ const createSale = async (saleData, userId) => {
             }
 
             product.quantity -= item.quantity;
+
+            // Variantlarni yangilash (agar mavjud bo'lsa)
+            if (product.variants && product.variants.length > 0) {
+                let remainingToSubtract = item.quantity;
+                for (let variant of product.variants) {
+                    if (remainingToSubtract <= 0) break;
+                    
+                    const canSubtract = Math.min(variant.quantity, remainingToSubtract);
+                    variant.quantity -= canSubtract;
+                    remainingToSubtract -= canSubtract;
+                }
+                
+                // Agar variantlarda yetarli bo'lmasa (lekin totalda bo'lsa), 
+                // oxirgi variantdan ayirib tashlaymiz (manfiy bo'lsa ham UI to'g'ri chiqishi uchun)
+                if (remainingToSubtract > 0) {
+                    product.variants[product.variants.length - 1].quantity -= remainingToSubtract;
+                }
+            }
+
             product.soldHistory.push({
                 soldPrice: item.price,
                 quantity: item.quantity,

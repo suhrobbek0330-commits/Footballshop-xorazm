@@ -49,10 +49,18 @@ const ProductList = () => {
 
     useEffect(() => {
         fetchProducts();
+
+        // Har 10 soniyada ma'lumotlarni yangilab turish (Real-time effekt)
+        const interval = setInterval(() => {
+            fetchProducts();
+        }, 10000);
+
+        return () => clearInterval(interval);
     }, [keyword]);
 
     const fetchProducts = async () => {
-        setLoading(true);
+        // Faqat birinchi marta yuklanganda spinner ko'rsatish
+        if (products.length === 0) setLoading(true);
         try {
             const { data } = await api.get(`/products?keyword=${keyword}`);
             setProducts(data);
