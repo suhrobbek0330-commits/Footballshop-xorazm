@@ -1,0 +1,20 @@
+services:
+  backend:
+    build: ./backend
+    container_name: football-backend
+    ports:
+      - "5000:5000"
+    environment:
+      - NODE_ENV=production
+      - MONGO_URI=${MONGO_URI}
+      - JWT_SECRET=${JWT_SECRET}
+    restart: always
+
+  frontend:
+    build: ./frontend
+    container_name: football-frontend
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+    restart: always

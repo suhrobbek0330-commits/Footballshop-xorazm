@@ -1,0 +1,25 @@
+# Stage 1: Build
+FROM node:18-alpine as build-stage
+
+WORKDIR /app
+
+# Copy package files and install dependencies
+COPY package*.json ./
+RUN npm install
+
+# Copy source code and build for production
+COPY . .
+RUN npm run build
+
+# Stage 2: Serve
+FROM nginx:stable-alpine
+
+# Copy custom nginx configuration
+COPY nginx.conf /etc/nginx/conf.d/default.conf
+
+# Copy build assets from stage 1
+COPY --from=build-stage /app/dist /usr/share/nginx/html
+
+EXPOSE 80
+
+CMD ["nginx", "-g", "daemon off;"]
