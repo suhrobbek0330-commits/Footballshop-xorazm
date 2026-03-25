@@ -53,10 +53,18 @@ export const productSlice = createSlice({
                 state.isError = true;
                 state.message = action.payload;
             })
+            .addCase(createProduct.pending, (state) => {
+                state.isLoading = true;
+            })
             .addCase(createProduct.fulfilled, (state, action) => {
                 state.isLoading = false;
                 state.isSuccess = true;
                 state.products.push(action.payload);
+            })
+            .addCase(createProduct.rejected, (state, action) => {
+                state.isLoading = false;
+                state.isError = true;
+                state.message = action.payload;
             });
     },
 });

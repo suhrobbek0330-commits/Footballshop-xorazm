@@ -4,15 +4,12 @@ const Debt = require('../models/Debt');
 const mongoose = require('mongoose');
 
 const createSale = async (saleData, userId) => {
-    const session = await mongoose.startSession();
-    session.startTransaction();
-
     try {
         const { items, totalAmount, paymentMethod } = saleData;
         let finalItems = [];
 
         for (const item of items) {
-            const product = await Product.findById(item.product).session(session);
+            const product = await Product.findById(item.product);
 
             if (!product) {
                 throw new Error(`Product not found: ${item.productName}`);
@@ -48,7 +45,7 @@ const createSale = async (saleData, userId) => {
                 date: new Date()
             });
 
-            await product.save({ session });
+            await product.save();
 
             finalItems.push({
                 product: product._id,
@@ -59,20 +56,15 @@ const createSale = async (saleData, userId) => {
             });
         }
 
-        const sale = await Sale.create([{
+        const sale = await Sale.create({
             items: finalItems,
             totalAmount,
             paymentMethod,
             cashier: userId || null
-        }], { session });
+        });
 
-        await session.commitTransaction();
-        session.endSession();
-
-        return sale[0];
+        return sale;
     } catch (error) {
-        await session.abortTransaction();
-        session.endSession();
         throw error;
     }
 };

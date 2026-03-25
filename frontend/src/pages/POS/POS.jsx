@@ -115,25 +115,6 @@ const POS = () => {
                 status: 'pending'
             });
 
-            // Then reduce stock (simulating a sale but not recording in Sales till paid, 
-            // though usually business logic varies. Here we at least reduce stock)
-            // For now, our backend Sale creation handles stock, 
-            // but we might need a dedicated Sale record marked as "unpaid" or just wait for debt payment.
-            // According to our backend, stock is reduced when a SALE is created.
-            // Let's create a sale too, but maybe marked as debt?
-            // Existing Backend implementation of createSale reduces stock.
-            // Let's create a sale with paymentMethod: 'cash' (recorded when debt is PAID).
-            // Actually, let's just create the debt. The stock reduction will happen when debt is marked as PAID 
-            // according to current backend logic in debtService.js:25.
-            // Wait, if we don't reduce stock NOW, the product can be sold again.
-            // BETTER: Create a sale NOW with paymentMethod: 'card' or similar, 
-            // OR modify backend.
-
-            // For simplicity and matching current backend (debtService.js), 
-            // stock is NOT reduced until debt is paid. This is a BUG. 
-            // I should fix the backend to reduce stock when debt is created, OR create a sale now.
-
-            // Let's stick to the current plan: 
             toast.success('Nasiya muvaffaqiyatli saqlandi!');
             setIsDebtModalOpen(false);
             setCart([]);

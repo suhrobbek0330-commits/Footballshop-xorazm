@@ -3,15 +3,12 @@ const Debt = require('../models/Debt');
 const mongoose = require('mongoose');
 
 const createDebt = async (debtData) => {
-    const session = await mongoose.startSession();
-    session.startTransaction();
-
     try {
         const { products } = debtData;
 
         for (const item of products) {
             if (item.product) {
-                const product = await Product.findById(item.product).session(session);
+                const product = await Product.findById(item.product);
                 if (product) {
                     if (product.quantity < item.quantity) {
                         throw new Error(`Mahsulot yetarli emas: ${product.name}`);
@@ -39,19 +36,14 @@ const createDebt = async (debtData) => {
                         quantity: item.quantity,
                         date: new Date()
                     });
-                    await product.save({ session });
+                    await product.save();
                 }
             }
         }
 
-        const debt = await Debt.create([debtData], { session });
-
-        await session.commitTransaction();
-        session.endSession();
-        return debt[0];
+        const debt = await Debt.create(debtData);
+        return debt;
     } catch (error) {
-        await session.abortTransaction();
-        session.endSession();
         throw error;
     }
 };
