@@ -18,6 +18,7 @@ const DemandList = () => {
             const { data } = await api.get('/demands');
             setDemands(data);
         } catch (error) {
+            console.error(error);
             toast.error('Talablarni yuklashda xatolik!');
         } finally {
             setLoading(false);
@@ -30,6 +31,7 @@ const DemandList = () => {
             toast.success('Talab bajarildi deb belgilandi');
             fetchDemands();
         } catch (error) {
+            console.error(error);
             toast.error('Xatolik yuz berdi');
         }
     };
