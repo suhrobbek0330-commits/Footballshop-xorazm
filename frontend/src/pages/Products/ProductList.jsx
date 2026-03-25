@@ -56,6 +56,7 @@ const ProductList = () => {
         }, 10000);
 
         return () => clearInterval(interval);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [keyword]);
 
     const fetchProducts = async () => {
@@ -65,6 +66,7 @@ const ProductList = () => {
             const { data } = await api.get(`/products?keyword=${keyword}`);
             setProducts(data);
         } catch (error) {
+            console.error(error);
             toast.error('Mahsulotlarni yuklashda xatolik!');
         } finally {
             setLoading(false);
@@ -111,6 +113,7 @@ const ProductList = () => {
                 toast.success("Mahsulot o'chirildi");
                 fetchProducts();
             } catch (error) {
+                console.error(error);
                 toast.error('Xatolik yuz berdi');
             }
         }

@@ -16,6 +16,7 @@ const Users = () => {
             const { data } = await api.get('/auth/users');
             setUsers(data);
         } catch (error) {
+            console.error(error);
             toast.error('Foydalanuvchilarni yuklashda xatolik!');
         } finally {
             setLoading(false);
@@ -28,6 +29,7 @@ const Users = () => {
             toast.success('Foydalanuvchi roli yangilandi');
             fetchUsers();
         } catch (error) {
+            console.error(error);
             toast.error('Rolni yangilashda xatolik yuz berdi');
         }
     };

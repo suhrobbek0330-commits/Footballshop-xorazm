@@ -2,12 +2,12 @@ import React, { useState } from 'react';
 import { X, Calendar, User, Phone, Info } from 'lucide-react';
 
 const DebtModal = ({ isOpen, onClose, onConfirm, totalAmount }) => {
-    const [formData, setFormData] = useState({
+    const [formData, setFormData] = useState(() => ({
         customerName: '',
         phone: '',
         deadline: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
         note: ''
-    });
+    }));
 
     const handleChange = (e) => {
         const { name, value } = e.target;

@@ -18,6 +18,7 @@ const DebtList = () => {
             const { data } = await api.get('/debts');
             setDebts(data);
         } catch (error) {
+            console.error(error);
             toast.error('Qarzlarni yuklashda xatolik!');
         } finally {
             setLoading(false);

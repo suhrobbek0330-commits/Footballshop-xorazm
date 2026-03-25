@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from 'react';
+/* eslint-disable react-hooks/set-state-in-effect */
+import React, { useState, useEffect, useCallback } from 'react';
 import {
     BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer,
     PieChart, Pie, Cell, AreaChart, Area
@@ -19,11 +20,7 @@ const Dashboard = () => {
     const [loading, setLoading] = useState(true);
     const [isDemandModalOpen, setIsDemandModalOpen] = useState(false);
 
-    useEffect(() => {
-        fetchStats();
-    }, [period]);
-
-    const fetchStats = async () => {
+    const fetchStats = useCallback(async () => {
         try {
             setLoading(true);
             const { data } = await api.get(`/sales/stats?period=${period}`);
@@ -42,7 +39,11 @@ const Dashboard = () => {
                 trend: []
             });
         }
-    };
+    }, [period]);
+
+    useEffect(() => {
+        fetchStats();
+    }, [fetchStats]);
 
     const COLORS = ['#4F46E5', '#10B981', '#F59E0B', '#EF4444', '#8B5CF6'];
 
